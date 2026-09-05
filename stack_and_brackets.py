@@ -2,7 +2,7 @@ import unittest
 from typing import List, Any, Dict, Set
 
 # ==========================================
-# 1. БАЗОВЫЙ КЛАСС СТЭКА (С тайп-хинтами)
+# 1. БАЗОВЫЙ КЛАСС СТЭКА
 # ==========================================
 class Stack:
     def __init__(self) -> None:
@@ -39,6 +39,15 @@ class BracketValidator:
     def is_balanced(self, sequence: str) -> str:
         stack = Stack()
         
+        # Проверяем, есть ли вообще скобки в строке
+        has_brackets = any(
+            char in self._opening_brackets or char in self._bracket_map 
+            for char in sequence
+        )
+        
+        if not has_brackets:
+            return "В строке нет скобок"
+        
         for char in sequence:
             if char in self._opening_brackets:
                 stack.push(char)
@@ -50,7 +59,7 @@ class BracketValidator:
 
 
 # ==========================================
-# 3. ТЕСТЫ (Показываем знание unittest)
+# 3. ТЕСТЫ
 # ==========================================
 class TestBracketValidator(unittest.TestCase):
     def setUp(self):
@@ -60,16 +69,15 @@ class TestBracketValidator(unittest.TestCase):
         self.assertEqual(self.validator.is_balanced("(((([{}]))))"), "Сбалансированно")
         self.assertEqual(self.validator.is_balanced("[([])((([[[]]])))]{()}"), "Сбалансированно")
         self.assertEqual(self.validator.is_balanced("{{[()]}}"), "Сбалансированно")
-        self.assertEqual(self.validator.is_balanced(""), "Сбалансированно") # Пустая строка тоже валидна
+        self.assertEqual(self.validator.is_balanced(""), "В строке нет скобок")
 
     def test_unbalanced_sequences(self):
         self.assertEqual(self.validator.is_balanced("}{}"), "Несбалансированно")
         self.assertEqual(self.validator.is_balanced("{{[(])]}}"), "Несбалансированно")
         self.assertEqual(self.validator.is_balanced("[[{())}]"), "Несбалансированно")
-        self.assertEqual(self.validator.is_balanced("((("), "Несбалансированно") # Не закрыты
+        self.assertEqual(self.validator.is_balanced("((("), "Несбалансированно")
 
     def test_stack_methods(self):
-        # На собеседовании могут попросить протестировать и сам стек!
         stack = Stack()
         self.assertTrue(stack.is_empty())
         stack.push(1)
@@ -79,5 +87,31 @@ class TestBracketValidator(unittest.TestCase):
         self.assertEqual(stack.pop(), 2)
         self.assertEqual(stack.size(), 1)
 
+    def test_no_brackets(self):
+        # Тестируем строки без скобок
+        self.assertEqual(self.validator.is_balanced("привет мир"), "В строке нет скобок")
+        self.assertEqual(self.validator.is_balanced("12345"), "В строке нет скобок")
+        self.assertEqual(self.validator.is_balanced("abc;;;"), "В строке нет скобок")
+
+
+# ==========================================
+# 4. ТОЧКА ВХОДА В ПРОГРАММУ
+# ==========================================
 if __name__ == '__main__':
-    unittest.main()
+    # Сначала запускаем тесты
+    unittest.main(argv=[''], exit=False, verbosity=2)
+    
+    # Затем запускаем интерактивный ввод
+    print("\n" + "="*30)
+    print("--- Режим проверки скобок ---")
+    print("="*30)
+    
+    # Читаем строку от пользователя
+    user_input = input("Введите строку со скобками: ")
+    
+    # Создаем валидатор и проверяем введенную строку
+    validator = BracketValidator()
+    result = validator.is_balanced(user_input)
+    
+    # Выводим результат на экран
+    print(result)
