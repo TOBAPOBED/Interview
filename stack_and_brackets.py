@@ -39,15 +39,6 @@ class BracketValidator:
     def is_balanced(self, sequence: str) -> str:
         stack = Stack()
         
-        # Проверяем, есть ли вообще скобки в строке
-        has_brackets = any(
-            char in self._opening_brackets or char in self._bracket_map 
-            for char in sequence
-        )
-        
-        if not has_brackets:
-            return "В строке нет скобок"
-        
         for char in sequence:
             if char in self._opening_brackets:
                 stack.push(char)
@@ -69,13 +60,19 @@ class TestBracketValidator(unittest.TestCase):
         self.assertEqual(self.validator.is_balanced("(((([{}]))))"), "Сбалансированно")
         self.assertEqual(self.validator.is_balanced("[([])((([[[]]])))]{()}"), "Сбалансированно")
         self.assertEqual(self.validator.is_balanced("{{[()]}}"), "Сбалансированно")
-        self.assertEqual(self.validator.is_balanced(""), "В строке нет скобок")
+        self.assertEqual(self.validator.is_balanced(""), "Сбалансированно")  # Пустая строка — сбалансирована
 
     def test_unbalanced_sequences(self):
         self.assertEqual(self.validator.is_balanced("}{}"), "Несбалансированно")
         self.assertEqual(self.validator.is_balanced("{{[(])]}}"), "Несбалансированно")
         self.assertEqual(self.validator.is_balanced("[[{())}]"), "Несбалансированно")
         self.assertEqual(self.validator.is_balanced("((("), "Несбалансированно")
+
+    def test_no_brackets(self):
+        # Строки без скобок тоже считаются сбалансированными
+        self.assertEqual(self.validator.is_balanced("привет мир"), "Сбалансированно")
+        self.assertEqual(self.validator.is_balanced("12345"), "Сбалансированно")
+        self.assertEqual(self.validator.is_balanced("abc;;;"), "Сбалансированно")
 
     def test_stack_methods(self):
         stack = Stack()
@@ -86,12 +83,6 @@ class TestBracketValidator(unittest.TestCase):
         self.assertEqual(stack.size(), 2)
         self.assertEqual(stack.pop(), 2)
         self.assertEqual(stack.size(), 1)
-
-    def test_no_brackets(self):
-        # Тестируем строки без скобок
-        self.assertEqual(self.validator.is_balanced("привет мир"), "В строке нет скобок")
-        self.assertEqual(self.validator.is_balanced("12345"), "В строке нет скобок")
-        self.assertEqual(self.validator.is_balanced("abc;;;"), "В строке нет скобок")
 
 
 # ==========================================
